@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Hostel</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+<div class="container mt-5">
+
+    <div class="card shadow p-4">
+        <h2 class="text-center mb-4">🏨 Smart Hostel - Room Management</h2>
+
+        <!-- Add Room Form -->
+        <h4>Add Room</h4>
+        <form id="roomForm" class="row g-3">
+
+            <div class="col-md-4">
+                <label class="form-label">Capacity</label>
+                <input type="number" class="form-control" id="capacity" required>
+            </div>
+
+            <div class="col-md-4 d-flex align-items-end">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="hasAC">
+                    <label class="form-check-label">Has AC</label>
+                </div>
+            </div>
+
+            <div class="col-md-4 d-flex align-items-end">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="hasWashroom">
+                    <label class="form-check-label">Has Washroom</label>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">Add Room</button>
+                <button type="button" onclick="getRooms()" class="btn btn-success ms-2">Load Rooms</button>
+            </div>
+
+        </form>
+    </div>
+
+    <!-- Room Table -->
+    <div class="card shadow mt-4 p-4">
+        <h4>All Rooms</h4>
+        <table class="table table-bordered table-striped mt-3">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Capacity</th>
+                    <th>AC</th>
+                    <th>Washroom</th>
+                </tr>
+            </thead>
+            <tbody id="roomTable">
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+document.getElementById("roomForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const room = {
+        capacity: document.getElementById("capacity").value,
+        hasAC: document.getElementById("hasAC").checked,
+        hasAttachedWashroom: document.getElementById("hasWashroom").checked
+    };
+
+    fetch("/rooms", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(room)
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert("Room Added Successfully!");
+        getRooms();
+    });
+});
+
+function getRooms() {
+    fetch("/rooms")
+    .then(response => response.json())
+    .then(data => {
+        const table = document.getElementById("roomTable");
+        table.innerHTML = "";
+
+        data.forEach(room => {
+            const row = `
+                <tr>
+                    <td>${room.id}</td>
+                    <td>${room.capacity}</td>
+                    <td>${room.hasAC}</td>
+                    <td>${room.hasAttachedWashroom}</td>
+                </tr>
+            `;
+            table.innerHTML += row;
+        });
+    });
+}
+</script>
+
+</body>
+</html>
